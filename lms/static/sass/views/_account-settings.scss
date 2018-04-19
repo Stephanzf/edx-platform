@@ -536,8 +536,6 @@
     }
 
     .account-deletion-details {
-      padding-top: 50px;
-
       .btn-outline-primary {
         @extend %ui-clear-button;
 
@@ -550,6 +548,7 @@
         color: $blue;
         padding: 11px 14px;
         line-height: normal;
+        margin: 20px 0;
       }
 
       .paragon__modal-open {
@@ -558,6 +557,10 @@
 
         .paragon__modal-title {
           font-weight: $font-semibold;
+        }
+
+        .paragon__modal-body {
+          line-height: 1.5;
         }
 
         .paragon__alert-warning {
@@ -572,22 +575,37 @@
         .confirm-password-input {
           width: 50%;
         }
+
+        .paragon__btn:not(.paragon__btn-outline-primary) {
+          @extend %btn-primary-blue;
+        }
+
+        .paragon__btn-outline-primary {
+          @extend %ui-clear-button;
+
+          // set styles
+          @extend %btn-pl-default-base;
+
+          @include font-size(18);
+
+          border-color: transparent;
+          color: $blue;
+          padding: 11px 14px;
+          line-height: normal;
+        }
       }
 
       .modal-alert {
         display: flex;
 
         .icon-wrapper {
-          padding: {
-            top: 2px;
-            right: 15px;
-          }
+          padding-right: 15px;
         }
 
         .alert-content {
           .alert-title {
             color: $dark-gray;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font: {
               size: 1rem;
               weight: $font-semibold;

@@ -7,28 +7,17 @@ import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 class StudentAccountDeletionConfirmationModal extends React.Component {
-  static passwordFieldValidation(value) {
-    let feedback = { isValid: true };
-
-    if (value.length < 1) {
-      feedback = {
-        isValid: false,
-        validationMessage: gettext('A Password is required'),
-        dangerIconDescription: 'Error',
-      };
-    }
-
-    return feedback;
-  }
-
   constructor(props) {
     super(props);
 
     this.deleteAccount = this.deleteAccount.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.passwordFieldValidation = this.passwordFieldValidation.bind(this);
     this.state = {
       password: '',
       passwordSubmitted: false,
+      isValid: true,
+      validationMessage: '',
       accountQueuedForDeletion: false,
       responseError: false,
       responseErrorBody: {},
@@ -60,6 +49,17 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
   // TODO: hook into field validation somehow
   failedSubmission(error) {
+    // Temp. hack for local dev - start
+    const { password } = this.state;
+    if (password === 'yes') {
+      return this.setState({
+        accountQueuedForDeletion: true,
+        responseError: false,
+        responseErrorBody: {},
+      });
+    }
+    // Temp. hack for local dev - end
+
     const { status } = error;
     const title = status === 403 ? gettext('Password is incorrect') : gettext('Unable to delete account');
     const body = status === 403 ? gettext('Please re-enter your password.') : gettext('Sorry, there was an error trying to process your request. Please try again later.');
@@ -67,12 +67,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.setState({
       passwordSubmitted: false,
       responseError: true,
-      responseErrorBody: {
-        isValid: false,
-        validationMessage: title,
-        validationMessageBody: body,
-        dangerIconDescription: 'Error',
-      },
+      isValid: false,
+      validationMessage: title,
+      validationErrorDetails: body,
     });
   }
 
@@ -80,9 +77,29 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.setState({ password: value });
   }
 
+  passwordFieldValidation(value) {
+    let feedback = { isValid: true };
+
+    if (value.length < 1) {
+      feedback = {
+        isValid: false,
+        validationMessage: gettext('A Password is required'),
+      };
+    }
+
+    this.setState(feedback);
+  }
+
   renderConfirmationModal() {
+    const {
+      isValid,
+      password,
+      passwordSubmitted,
+      responseError,
+      validationErrorDetails,
+      validationMessage,
+    } = this.state;
     const { onClose } = this.props;
-    const { password, passwordSubmitted, responseError, responseErrorBody } = this.state;
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
@@ -107,8 +124,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                       <Icon className={['fa', 'fa-exclamation-circle']} />
                     </div>
                     <div className="alert-content">
-                      <h3 className="alert-title">{ responseErrorBody.validationMessage }</h3>
-                      <p>{ responseErrorBody.validationMessageBody }</p>
+                      <h3 className="alert-title">{ validationMessage }</h3>
+                      <p>{ validationErrorDetails }</p>
                     </div>
                   </div>
                 )}
@@ -140,7 +157,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
               label="Password"
               type="password"
               className={['confirm-password-input']}
-              validator={this.passwordFieldValidation}
+              onBlur={this.passwordFieldValidation}
+              isValid={isValid}
+              validationMessage={validationMessage}
               onChange={this.handleChange}
               autoComplete="new-password"
               themes={['danger']}
