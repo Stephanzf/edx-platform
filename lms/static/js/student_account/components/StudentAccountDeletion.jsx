@@ -10,13 +10,11 @@ export class StudentAccountDeletion extends React.Component {
     super(props);
     this.closeDeletionModal = this.closeDeletionModal.bind(this);
     this.loadDeletionModal = this.loadDeletionModal.bind(this);
-    this.state = {
-      deletionModalOpen: false,
-      successModalOpen: false,
-    };
+    this.state = { deletionModalOpen: false };
   }
 
   closeDeletionModal() {
+    this.setState({ deletionModalOpen: false });
     this.modalTrigger.focus();
   }
 

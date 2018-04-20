@@ -10,6 +10,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   constructor(props) {
     super(props);
 
+    this.closeConfirmationModal = this.closeConfirmationModal.bind(this);
     this.deleteAccount = this.deleteAccount.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.passwordFieldValidation = this.passwordFieldValidation.bind(this);
@@ -22,6 +23,12 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
       responseError: false,
       responseErrorBody: {},
     };
+  }
+
+  closeConfirmationModal() {
+    const { onClose } = this.props;
+
+    onClose();
   }
 
   deleteAccount() {
@@ -168,6 +175,10 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         )}
         closeText={gettext('Cancel')}
         buttons={[
+          <Button
+            label={gettext('Cancel')}
+            onClick={this.closeConfirmationModal}
+          />,
           <Button
             label={gettext('Yes, Delete')}
             onClick={this.deleteAccount}
